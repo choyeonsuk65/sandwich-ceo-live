@@ -1,0 +1,68 @@
+{
+  "rules": {
+    "rooms": {
+      "$room": {
+        "meta": {
+          ".read": "auth != null",
+          ".write": "auth != null && ((!data.exists() && newData.child('teacherUid').val() == auth.uid) || data.child('teacherUid').val() == auth.uid)"
+        },
+        "config": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val()"
+        },
+        "state": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val()"
+        },
+        "inventory": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val()"
+        },
+        "history": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val()"
+        },
+        "teams": {
+          "$team": {
+            ".read": "auth != null",
+            ".write": "auth != null && auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val()",
+            "deviceUid": {
+              ".write": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || (!data.exists() && newData.val() == auth.uid))"
+            },
+            "joinedAt": {
+              ".write": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())"
+            }
+          }
+        },
+        "mainSelections": {
+          "$team": {
+            ".read": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())",
+            ".write": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())"
+          }
+        },
+        "participation": {
+          "$auction": {
+            "$team": {
+              ".read": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())",
+              ".write": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())"
+            }
+          }
+        },
+        "bids": {
+          "$auction": {
+            "$team": {
+              ".read": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())",
+              ".write": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())"
+            }
+          }
+        },
+        "activity": {
+          "$team": {
+            ".read": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())",
+            ".write": "auth != null && (auth.uid == root.child('rooms').child($room).child('meta').child('teacherUid').val() || auth.uid == root.child('rooms').child($room).child('teams').child($team).child('deviceUid').val())"
+          }
+        }
+      }
+    }
+  }
+}
