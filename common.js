@@ -1,6 +1,6 @@
 window.SCEO = (()=>{
   const DEF={
-    title:'샌드위치 경매 CEO · 온라인 실시간 통합형',studentCount:15,teamCount:5,teamBudget:30000,auctionSeconds:15,maxAddons:2,
+    title:'샌드위치 경매 CEO · 온라인 실시간 통합형',studentCount:15,teamCount:5,teamBudget:30000,auctionSeconds:30,maxAddons:2,
     commonIngredients:['식빵','양상추/샐러드채소','마요네즈','케첩','허니머스타드','생수'],
     mainItems:[
       {id:'ham',name:'슬라이스 햄',startPrice:5000,stock:1},{id:'chicken',name:'조리 닭가슴살',startPrice:5500,stock:1},

@@ -1,11 +1,13 @@
 const A=SCEO;let db,uid,ROOMCODE='',TEAM='',ROOM=null,ACT={},STEP=1,unsubs=[],timerHandle=null;const $=A.$,$$=A.$$;
 function setMsg(t,ok=false){$('#joinMsg').className=ok?'okbox':'notice';$('#joinMsg').textContent=t}
 function fillTeamSelect(sel,count=5){sel.innerHTML=Array.from({length:count},(_,i)=>`<option value="${i+1}">${i+1}조</option>`).join('')}
+function leaveClosedRoom(){unsubs.forEach(fn=>{try{fn()}catch(e){}});unsubs=[];if(timerHandle)clearInterval(timerHandle);ROOMCODE='';TEAM='';ROOM=null;ACT={};localStorage.removeItem('sceo_v2_join');$('#app').classList.add('hidden');$('#join').classList.remove('hidden');$('#joinRoom').value='';$('#joinTeam').value='1';setMsg('수업이 종료되었습니다. 새 수업방 코드를 입력하세요.',true);}
 async function init(){if(!A.configReady()){ $('#needSetup').classList.remove('hidden');return}try{const f=await A.firebaseInit();db=f.db;uid=f.uid;$('#join').classList.remove('hidden');fillTeamSelect($('#joinTeam'),12);const saved=JSON.parse(localStorage.getItem('sceo_v2_join')||'null');if(saved){$('#joinRoom').value=saved.room||'';$('#joinTeam').value=saved.team||'1'}}catch(e){$('#needSetup').classList.remove('hidden');$('#needSetup .warnbox').textContent='연결 실패: '+e.message}}
 async function joinRoom(){const room=$('#joinRoom').value.trim(),team=$('#joinTeam').value;if(!/^\d{6}$/.test(room))return setMsg('6자리 방 코드를 입력하세요.');const meta=await A.read(A.roomPath(room,'meta'));if(!meta)return setMsg('수업방을 찾지 못했습니다. 방 코드를 확인하세요.');if(meta.closed)return setMsg('이미 종료된 수업방입니다.');const cfg=await A.read(A.roomPath(room,'config')),t=await A.read(A.roomPath(room,'teams',team));if(!t)return setMsg('이 수업방에는 해당 조가 없습니다.');if(t.deviceUid&&t.deviceUid!==uid)return setMsg(`${team}조는 이미 다른 대표 휴대폰이 연결되어 있습니다. 선생님께 연결 해제를 요청하세요.`);if(!t.deviceUid)await A.set(A.roomPath(room,'teams',team,'deviceUid'),uid);await A.set(A.roomPath(room,'teams',team,'joinedAt'),firebase.database.ServerValue.TIMESTAMP);ROOMCODE=room;TEAM=team;localStorage.setItem('sceo_v2_join',JSON.stringify({room,team}));$('#join').classList.add('hidden');$('#app').classList.remove('hidden');$('#roomLabel').textContent=room;fillTeamSelect($('#teamSelect'),cfg.teamCount);$('#teamSelect').value=team;subscribe();}
 function subscribe(){
   unsubs.forEach(fn=>{try{fn()}catch(e){}});unsubs=[];
   ROOM={config:null,state:{},inventory:{},teams:{},mainSelections:{}};
+  unsubs.push(A.listen(A.roomPath(ROOMCODE,'meta'),v=>{if(v?.closed)leaveClosedRoom()}));
   const redraw=()=>{const t=ROOM.teams?.[TEAM];if(ROOM.config&&t){$('#budget').textContent=A.money(A.remaining(t,ROOM.config));render()}};
   unsubs.push(A.listen(A.roomPath(ROOMCODE,'config'),v=>{ROOM.config=v||null;redraw()}));
   unsubs.push(A.listen(A.roomPath(ROOMCODE,'state'),v=>{ROOM.state=v||{};redraw()}));
@@ -14,7 +16,7 @@ function subscribe(){
   unsubs.push(A.listen(A.roomPath(ROOMCODE,'mainSelections',TEAM),v=>{ROOM.mainSelections={[TEAM]:v||''};redraw()}));
   unsubs.push(A.listen(A.roomPath(ROOMCODE,'activity',TEAM),v=>{ACT=v||{};redraw()}));
 }
-async function switchTeam(team){if(team===TEAM)return;const t=await A.read(A.roomPath(ROOMCODE,'teams',team));if(t?.deviceUid&&t.deviceUid!==uid){alert(`${team}조는 다른 대표 휴대폰이 연결되어 있습니다.`);$('#teamSelect').value=TEAM;return}if(!t?.deviceUid)await A.set(A.roomPath(ROOMCODE,'teams',team,'deviceUid'),uid);TEAM=team;localStorage.setItem('sceo_v2_join',JSON.stringify({room:ROOMCODE,team}));subscribe()}
+async function switchTeam(team){if(team===TEAM)return;const t=await A.read(A.roomPath(ROOMCODE,'teams',team));if(t?.deviceUid&&t.deviceUid!==uid){alert(`${team}조는 다른 대표 휴대폰이 연결되어 있습니다.`);$('#teamSelect').value=TEAM;return}if(!t?.deviceUid)await A.set(A.roomPath(ROOMCODE,'teams',team,'deviceUid'),uid);await A.set(A.roomPath(ROOMCODE,'teams',team,'joinedAt'),firebase.database.ServerValue.TIMESTAMP);TEAM=team;localStorage.setItem('sceo_v2_join',JSON.stringify({room:ROOMCODE,team}));subscribe()}
 function goto(step){STEP=+step;$$('.tab').forEach(b=>b.classList.toggle('on',+b.dataset.step===STEP));render()}
 function saveActivity(patch){ACT={...ACT,...patch};return A.update(A.roomPath(ROOMCODE,'activity',TEAM),patch)}
 function bindInputs(){$$('[data-act]').forEach(el=>{const key=el.dataset.act;const handler=()=>saveActivity({[key]:el.type==='checkbox'?el.checked:el.value});el.onchange=handler;if(el.tagName==='TEXTAREA'||el.type==='text'||el.type==='number')el.oninput=handler});$$('[data-arr]').forEach(el=>el.onchange=()=>{const k=el.dataset.arr,a=$$(`[data-arr="${k}"]:checked`).map(x=>x.value);saveActivity({[k]:a})})}
