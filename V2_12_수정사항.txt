@@ -1,0 +1,37 @@
+샌드위치 경매 CEO 온라인 실시간 관제탑 V2.12 수정사항
+작성일: 2026-09-30
+
+[재현된 문제]
+- 추가재료 '오이피클' 참여/패스에서 1~4조는 교사용 관제탑에 표시되지만
+  마지막 5조 응답 후 관제탑이 '응답 4/5조'에 멈춤.
+- 5조 학생 화면에서는 '참여 선택됨/패스 선택됨' 및
+  '선생님에게 전송되었습니다.'가 정상 표시됨.
+
+[확정 원인]
+- 학생.js는 participation/<offerId>/<teamId>에 값을 저장한 뒤 다시 읽어
+  서버 확인까지 성공해야 '전송되었습니다'를 표시함.
+- teacher.js의 subscribeRoom()은 meta/state/inventory/history/config,
+  teams/mainSelections만 실시간 구독하고 participation 경로는 구독하지 않았음.
+- 따라서 participation 값만 바뀌면 교사용 renderAuction()이 자동 실행되지 않음.
+- 1~4조는 다음 조로 변경할 때 teams/<team>/joinedAt 갱신이 일어나
+  teacher.js의 팀 구독이 renderAll()을 호출하면서 직전 응답이 우연히 표시됨.
+- 5조는 마지막이라 다음 조 변경이 없어서 추가 렌더 트리거가 발생하지 않아
+  4/5 화면에 멈춤.
+
+[V2.12 수정]
+subscribeRoom()에 아래 실시간 구독 1줄 추가:
+unsubs.push(A.listen(A.roomPath(code,'participation'),()=>{renderAuction()}));
+
+[효과]
+- 참여/패스 값이 Firebase에서 변할 때마다 교사용 현재 경매 영역을 즉시 다시 그림.
+- 마지막 조 응답도 별도의 조 변경이나 새로고침 없이 즉시 5/5로 반영.
+- 기존 메인재료 선택, 낙찰, 재고, 입찰 로직은 변경하지 않음.
+
+[검증 순서]
+1. GitHub에 teacher_v2_11_backup.js와 V2_12_수정사항.txt를 먼저 업로드하여 V2.11 보존.
+2. 수정된 teacher.js를 라이브 teacher.js로 반영.
+3. GitHub Pages 배포 완료 후 교사용 페이지 새로고침.
+4. 현재 방 301869가 유지되어 있으면 오이피클 상태에서
+   '응답 5/5조'가 즉시 표시되는지 확인.
+5. 이후 새 수업방에서 1~5조 참여/패스를 다시 실기기 검증.
+6. 성공 후 경쟁입찰, 최고가 낙찰, 예산 차감, 동가 재입찰, 음료 업그레이드 검증.
