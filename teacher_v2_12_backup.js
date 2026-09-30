@@ -1,4 +1,4 @@
-const A=SCEO;let db,uid,ROOM=null,ROOMCODE='',CFG=JSON.parse(JSON.stringify(A.DEF)),unsubs=[],teamUnsubs=[],participationUnsubs=[],participationOfferKey='',timerHandle=null,soundOn=true,voiceOn=true,lockMainBusy=false,auctionClosing=false,offerFinalizing=false;
+const A=SCEO;let db,uid,ROOM=null,ROOMCODE='',CFG=JSON.parse(JSON.stringify(A.DEF)),unsubs=[],teamUnsubs=[],timerHandle=null,soundOn=true,voiceOn=true,lockMainBusy=false,auctionClosing=false,offerFinalizing=false;
 const $=A.$,$$=A.$$;
 function beep(freq=760,dur=.12){if(!soundOn)return;try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.frequency.value=freq;o.connect(g);g.connect(c.destination);g.gain.value=.05;o.start();setTimeout(()=>{o.stop();c.close()},dur*1000)}catch(e){}}
 function speak(t){if(!voiceOn||!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.rate=1.05;speechSynthesis.cancel();speechSynthesis.speak(u)}
@@ -10,24 +10,9 @@ function collectSettings(){CFG.studentCount=Math.max(3,+$('#studentCount').value
 function initInventory(cfg){const inv={};['mainItems','addonItems','drinkItems'].forEach(cat=>cfg[cat].forEach(x=>inv[x.id]={remaining:+x.stock||1}));return inv}
 function initTeams(cfg){const sizes=A.teamSizes(cfg.studentCount,cfg.teamCount),t={};sizes.forEach((s,i)=>t[String(i+1)]={name:`${i+1}조`,size:s,deviceUid:null,joinedAt:null,awards:{}});return t}
 async function createRoom(){collectSettings();let code;for(let i=0;i<10;i++){code=A.randRoom();if(!(await A.read(A.roomPath(code,'meta'))))break}ROOMCODE=code;localStorage.setItem('sceo_v2_room',code);const meta={teacherUid:uid,createdAt:firebase.database.ServerValue.TIMESTAMP,title:CFG.title,closed:false};const state={phase:'planning',mainSelectionOpen:false,mainSelectionMode:'initial',mainSelectionTargets:{},pendingContests:{},reselectTeams:{},currentAuction:null,offer:null,reflectionOpen:false};await A.set(A.roomPath(code,'meta'),meta);await Promise.all([A.set(A.roomPath(code,'config'),CFG),A.set(A.roomPath(code,'state'),state),A.set(A.roomPath(code,'inventory'),initInventory(CFG))]);const teams=initTeams(CFG);await Promise.all(Object.entries(teams).map(([id,t])=>A.set(A.roomPath(code,'teams',id),t)));subscribeRoom(code);beep();speak('새 수업방을 만들었습니다. 방 코드는 '+code.split('').join(' '));}
-function clearParticipationSubs(){participationUnsubs.forEach(f=>{try{f()}catch(e){}});participationUnsubs=[];participationOfferKey=''}
-function bindParticipationSubs(){
-  const o=ROOM?.state?.offer;
-  if(!o){clearParticipationSubs();return}
-  const q=(o.qualifiedTeams||[]).map(String);
-  const key=o.id+'|'+q.join(',');
-  if(participationOfferKey===key)return;
-  clearParticipationSubs();
-  participationOfferKey=key;
-  q.forEach(t=>{
-    participationUnsubs.push(
-      A.listen(A.roomPath(ROOMCODE,'participation',o.id,t),()=>renderAuction())
-    );
-  });
-}
-function clearSubs(){unsubs.forEach(f=>{try{f()}catch(e){}});teamUnsubs.forEach(f=>{try{f()}catch(e){}});clearParticipationSubs();unsubs=[];teamUnsubs=[]}
+function clearSubs(){unsubs.forEach(f=>{try{f()}catch(e){}});teamUnsubs.forEach(f=>{try{f()}catch(e){}});unsubs=[];teamUnsubs=[]}
 function bindTeamSubs(code,count){teamUnsubs.forEach(f=>{try{f()}catch(e){}});teamUnsubs=[];ROOM.teams={};ROOM.mainSelections={};for(let i=1;i<=count;i++){const id=String(i);teamUnsubs.push(A.listen(A.roomPath(code,'teams',id),v=>{ROOM.teams[id]=v||null;renderAll()}));teamUnsubs.push(A.listen(A.roomPath(code,'mainSelections',id),v=>{if(v===null||v===undefined)delete ROOM.mainSelections[id];else ROOM.mainSelections[id]=v;renderAll()}))}}
-function subscribeRoom(code){clearSubs();ROOMCODE=code;localStorage.setItem('sceo_v2_room',code);ROOM={meta:null,config:null,state:{},inventory:{},teams:{},mainSelections:{},history:{}};unsubs.push(A.listen(A.roomPath(code,'meta'),v=>{ROOM.meta=v||null;renderAll()}));unsubs.push(A.listen(A.roomPath(code,'state'),v=>{ROOM.state=v||{};bindParticipationSubs();renderAll()}));unsubs.push(A.listen(A.roomPath(code,'inventory'),v=>{ROOM.inventory=v||{};renderAll()}));unsubs.push(A.listen(A.roomPath(code,'history'),v=>{ROOM.history=v||{};renderAll()}));unsubs.push(A.listen(A.roomPath(code,'config'),v=>{const prev=ROOM.config?.teamCount;ROOM.config=v||null;if(v){CFG=v;if(prev!==v.teamCount||!teamUnsubs.length)bindTeamSubs(code,+v.teamCount||5)}renderAll()}));}
+function subscribeRoom(code){clearSubs();ROOMCODE=code;localStorage.setItem('sceo_v2_room',code);ROOM={meta:null,config:null,state:{},inventory:{},teams:{},mainSelections:{},history:{}};unsubs.push(A.listen(A.roomPath(code,'meta'),v=>{ROOM.meta=v||null;renderAll()}));unsubs.push(A.listen(A.roomPath(code,'state'),v=>{ROOM.state=v||{};renderAll()}));unsubs.push(A.listen(A.roomPath(code,'inventory'),v=>{ROOM.inventory=v||{};renderAll()}));unsubs.push(A.listen(A.roomPath(code,'history'),v=>{ROOM.history=v||{};renderAll()}));unsubs.push(A.listen(A.roomPath(code,'config'),v=>{const prev=ROOM.config?.teamCount;ROOM.config=v||null;if(v){CFG=v;if(prev!==v.teamCount||!teamUnsubs.length)bindTeamSubs(code,+v.teamCount||5)}renderAll()}));unsubs.push(A.listen(A.roomPath(code,'participation'),()=>{renderAuction()}));}
 async function readAllTeams(){const ids=Array.from({length:+CFG.teamCount||5},(_,i)=>String(i+1));const vals=await Promise.all(ids.map(id=>A.read(A.roomPath(ROOMCODE,'teams',id))));const out={};ids.forEach((id,i)=>out[id]=vals[i]||null);return out}
 async function readChoices(kind,id,teams){const vals=await Promise.all((teams||[]).map(t=>A.read(A.roomPath(ROOMCODE,kind,id,String(t)))));const out={};(teams||[]).forEach((t,i)=>{if(vals[i]!==null&&vals[i]!==undefined)out[String(t)]=vals[i]});return out}
 function studentUrl(){const u=new URL('student.html',location.href);if(ROOMCODE)u.searchParams.set('room',ROOMCODE);return u.href}
