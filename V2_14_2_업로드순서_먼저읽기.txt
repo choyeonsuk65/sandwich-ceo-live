@@ -1,0 +1,18 @@
+V2.14.2 업로드 순서
+
+1) GitHub sandwich-ceo-live > Add file > Upload files
+2) 이 폴더의 4개 파일을 업로드
+   - student.js
+   - student_v2_14_backup.js
+   - student_v2_14_1_backup.js
+   - V2_14_2_수정사항.txt
+3) Commit summary:
+   V2.14.2 입력오류·경제용어 뜻보기 최종 수정
+4) Commit directly to the main branch 선택
+5) Actions에서 pages build and deployment 성공 확인
+6) 학생용에서 확인
+   - 한글 문장 입력이 끊기지 않는지
+   - ④ 경제회의에서 9개 경제용어의 뜻보기/닫기가 정상인지
+   - 체크 후 다른 탭 갔다 돌아와도 체크가 저장되는지
+
+주의: 기존 teacher.js, common.js, Firebase 파일은 이번 패치에서 건드리지 않습니다.
