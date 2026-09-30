@@ -1,0 +1,59 @@
+샌드위치 경매 CEO · V2.14 자동 정적점검 결과
+
+통과 52/52
+실패 0
+
+✅ common.js JavaScript 문법
+✅ teacher.js JavaScript 문법
+✅ student.js JavaScript 문법
+✅ firebase-rules.json JSON 형식
+✅ 라이브 화면 V2.14 표기
+✅ 라이브 화면에 V2.11 잔존 없음
+✅ 기본 경매 30초
+✅ 동점 재입찰 10초
+✅ 동점 같은 가격 재입찰 허용
+✅ V2.13 5조 실시간 하위경로 구독 유지
+✅ V2.12 부모 participation listener 제거 상태 유지
+✅ V2.14 교사 설정키 분리
+✅ V2.14 학생 연결키 분리
+✅ 늦은 입찰 차단
+✅ 경제활동 전환 안전장치
+✅ 참여 가능 0조 방지
+✅ 재료 반영: 식빵
+✅ 재료 반영: 양상추
+✅ 재료 반영: 슬라이스 햄
+✅ 재료 반영: 마요네즈
+✅ 재료 반영: 케첩
+✅ 재료 반영: 허니머스타드
+✅ 재료 반영: 생수
+✅ 재료 반영: 감자샐러드(공용 선택)
+✅ 재료 반영: 조리된 닭가슴살
+✅ 재료 반영: 참치
+✅ 재료 반영: 완숙 삶은달걀
+✅ 재료 반영: 크래미
+✅ 재료 반영: 고구마무스
+✅ 재료 반영: 슬라이스 치즈
+✅ 재료 반영: 토마토
+✅ 재료 반영: 오이피클
+✅ 재료 반영: 크림치즈
+✅ 재료 반영: 파인애플 슬라이스
+✅ 재료 반영: 콜라 업그레이드
+✅ 햄 메인경매에서 제거
+✅ 감자샐러드 메인경매에서 제거
+✅ 고구마무스 메인경매 추가
+✅ 학생 계획화면 기본·공용 재료 표시
+✅ index.html 로컬 참조 존재: style.css
+✅ index.html 로컬 참조 존재: teacher.html
+✅ index.html 로컬 참조 존재: student.html
+✅ index.html 로컬 참조 존재: firebase-setup.html
+✅ teacher.html 로컬 참조 존재: style.css
+✅ teacher.html 로컬 참조 존재: firebase-setup.html
+✅ teacher.html 로컬 참조 존재: firebase-config.js
+✅ teacher.html 로컬 참조 존재: common.js
+✅ teacher.html 로컬 참조 존재: teacher.js
+✅ student.html 로컬 참조 존재: style.css
+✅ student.html 로컬 참조 존재: firebase-config.js
+✅ student.html 로컬 참조 존재: common.js
+✅ student.html 로컬 참조 존재: student.js
+
+주의: 이 점검은 코드/설정 정적점검입니다. Firebase 실제 다중기기 통신, QR 카메라 인식, 브라우저 음성/효과음은 GitHub Pages 배포 후 실제 기기로 최종 리허설해야 합니다.

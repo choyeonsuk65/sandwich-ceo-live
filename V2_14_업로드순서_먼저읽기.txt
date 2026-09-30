@@ -1,0 +1,28 @@
+샌드위치 경매 CEO · V2.14 GitHub 업로드 순서
+
+1. GitHub 저장소 sandwich-ceo-live의 Code 화면으로 이동합니다.
+2. Add file → Upload files를 누릅니다.
+3. 아래 V2.14 업로드용 파일을 저장소 루트에 올립니다.
+4. Commit message: V2.14 학교용 최종 재료·30초·동점10초 반영
+5. Commit directly to the main branch 선택 상태 확인 → Commit changes.
+6. Actions → pages build and deployment 최신 항목이 Success인지 확인합니다.
+7. 배포 후 첫 화면에서 V2.14 표기를 확인합니다.
+8. 반드시 새 수업방을 만들어 최종 리허설합니다. 이전 V2.13 테스트방은 새 재료 목록을 갖고 있지 않습니다.
+
+라이브 교체 파일
+- common.js
+- teacher.js
+- student.js
+- index.html
+- teacher.html
+- student.html
+
+함께 보존할 기록/백업
+- V2_14_수정사항.txt
+- V2_14_최종점검표.txt
+- V2_14_업로드순서_먼저읽기.txt
+- *_v2_13_backup.* 파일들
+
+주의
+- firebase-config.js, firebase-rules.json, style.css는 이번 버전에서 변경하지 않았습니다.
+- V2.13 참여/패스 실시간 갱신 핵심 로직은 teacher.js에 그대로 유지되어 있습니다.

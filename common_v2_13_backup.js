@@ -1,11 +1,11 @@
 window.SCEO = (()=>{
   const DEF={
-    title:'샌드위치 경매 CEO · 온라인 실시간 통합형 V2.14',studentCount:15,teamCount:5,teamBudget:30000,auctionSeconds:30,maxAddons:2,
-    commonIngredients:['식빵','양상추','슬라이스 햄','마요네즈','케첩','허니머스타드','생수','감자샐러드(공용 선택)'],
+    title:'샌드위치 경매 CEO · 온라인 실시간 통합형',studentCount:15,teamCount:5,teamBudget:30000,auctionSeconds:30,maxAddons:2,
+    commonIngredients:['식빵','양상추/샐러드채소','마요네즈','케첩','허니머스타드','생수'],
     mainItems:[
-      {id:'chicken',name:'조리된 닭가슴살',startPrice:5500,stock:1},{id:'tuna',name:'참치',startPrice:5000,stock:1},
-      {id:'egg',name:'완숙 삶은달걀',startPrice:3500,stock:1},{id:'crab',name:'크래미',startPrice:4500,stock:1},
-      {id:'sweetpotato',name:'고구마무스',startPrice:4000,stock:1}],
+      {id:'ham',name:'슬라이스 햄',startPrice:5000,stock:1},{id:'chicken',name:'조리 닭가슴살',startPrice:5500,stock:1},
+      {id:'tuna',name:'참치',startPrice:5000,stock:1},{id:'egg',name:'삶은 달걀',startPrice:3500,stock:1},
+      {id:'crab',name:'크래미',startPrice:4500,stock:1},{id:'potato',name:'감자샐러드',startPrice:4000,stock:1}],
     addonItems:[
       {id:'cheese',name:'슬라이스 치즈',startPrice:2000,stock:2},{id:'tomato',name:'토마토',startPrice:1500,stock:2},
       {id:'pickle',name:'오이피클',startPrice:1200,stock:2},{id:'creamcheese',name:'크림치즈',startPrice:2500,stock:1},
